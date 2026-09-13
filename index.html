@@ -3,52 +3,47 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="A foundation preview for Art Taste Profiler.">
+    <meta name="description" content="Discover patterns in your visual art preferences through eight image-led choices.">
     <title>Art Taste Profiler</title>
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%278%27 fill=%27%2317212b%27/%3E%3Ccircle cx=%2724%27 cy=%2725%27 r=%2711%27 fill=%27%23f3f0e8%27/%3E%3Ccircle cx=%2742%27 cy=%2739%27 r=%2711%27 fill=%27%23a43d2d%27/%3E%3C/svg%3E">    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='8' fill='%2317212b'/%3E%3Ccircle cx='24' cy='25' r='11' fill='%23f3f0e8'/%3E%3Ccircle cx='42' cy='39' r='11' fill='%23a43d2d'/%3E%3C/svg%3E">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="polish.css">
   </head>
-  <body>
+  <body data-stage="welcome">
     <header class="site-header">
       <a class="wordmark" href="#main-content" aria-label="Art Taste Profiler home">
         <span aria-hidden="true">ATP</span>
         <strong>Art Taste Profiler</strong>
       </a>
-      <p class="phase-label">Foundation preview · Phase 0</p>
+      <p class="phase-label">A visual preference experiment</p>
     </header>
 
-    <main id="main-content">
-      <section class="intro" aria-labelledby="page-title">
-        <p class="eyebrow">A visual preference experiment</p>
-        <h1 id="page-title">Notice what draws you in.</h1>
-        <p class="lede">This early foundation demonstrates how the experience will load information and communicate progress, outcomes, and problems clearly.</p>
+    <main id="main-content" class="workspace">
+      <section class="product-heading" aria-labelledby="page-title">
+        <p class="eyebrow">Look first. Labels later.</p>
+        <h1 id="page-title">Art has a way of finding you.</h1>
+        <p>Eight choices can reveal the beginnings of a visual vocabulary.</p>
       </section>
 
-      <section class="workspace" aria-labelledby="workspace-title">
-        <div class="workspace-heading">
-          <div>
-            <p class="eyebrow">System preview</p>
-            <h2 id="workspace-title">Foundation states</h2>
-          </div>
-          <p id="status-line" class="status" role="status" aria-live="polite">Ready to load the sample.</p>
-        </div>
+      <section aria-labelledby="workspace-title">
+        <h2 id="workspace-title" class="visually-hidden">Taste profiler</h2>
+        <p id="status-line" class="status" role="status" aria-live="polite">Ready to discover your taste.</p>
+        <div id="view-region" class="view" aria-live="polite" aria-busy="false"></div>
+      </section>
 
+      <details class="foundation-checks">
+        <summary>Foundation state checks</summary>
+        <p>These controls preserve the Phase 0 regression states.</p>
         <div id="controls-region" class="controls" aria-label="Foundation preview controls">
-          <button id="load-button" class="primary-action" type="button">Load sample collection</button>
+          <button id="load-button" class="secondary-action" type="button">Load sample collection</button>
           <button id="empty-button" class="secondary-action" type="button">Preview empty state</button>
           <button id="error-button" class="secondary-action" type="button">Preview error state</button>
           <button id="clear-button" class="text-action" type="button">Clear results</button>
         </div>
-
-        <div id="view-region" class="view" aria-live="polite" aria-busy="false">
-          <div class="initial-state">
-            <span class="initial-mark" aria-hidden="true">01</span>
-            <p>Use the controls above to inspect each visible state.</p>
-          </div>
-        </div>
-      </section>
+      </details>
     </main>
 
-    <footer>
+    <footer class="site-footer">
       <p>An experimental taste snapshot—not a permanent description of you.</p>
     </footer>
 

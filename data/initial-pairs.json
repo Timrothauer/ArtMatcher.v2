@@ -1,0 +1,13 @@
+{
+  "seed": "phase-1-curated-v1",
+  "pairs": [
+    { "id": "initial-1", "leftId": "aic-65821", "rightId": "aic-27992" },
+    { "id": "initial-2", "leftId": "aic-29230", "rightId": "aic-2102" },
+    { "id": "initial-3", "leftId": "cma-98627", "rightId": "cma-165269" },
+    { "id": "initial-4", "leftId": "cma-171296", "rightId": "cma-124800" },
+    { "id": "initial-5", "leftId": "cma-111654", "rightId": "cma-124089" },
+    { "id": "initial-6", "leftId": "met-436105", "rightId": "met-544227" },
+    { "id": "initial-7", "leftId": "met-45434", "rightId": "met-435658" },
+    { "id": "initial-8", "leftId": "met-315786", "rightId": "met-437853" }
+  ]
+}

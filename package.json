@@ -1,0 +1,14 @@
+{
+  "name": "art-taste-profiler",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "generate:embeddings": "node scripts/generate-embeddings.mjs",
+    "validate": "node scripts/validate-dataset.mjs",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@huggingface/transformers": "3.8.1"
+  }
+}
