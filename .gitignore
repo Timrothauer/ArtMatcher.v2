@@ -1,0 +1,11 @@
+.env
+.env.local
+.env.*
+node_modules/
+.DS_Store
+.cache/
+models/
+tmp/
+coverage/
+.sites-runtime/
+

@@ -1,0 +1,19 @@
+{
+  "items": [
+    {
+      "id": "sample-observe",
+      "title": "Observe",
+      "description": "A fictional placeholder representing the future artwork comparison view."
+    },
+    {
+      "id": "sample-reflect",
+      "title": "Reflect",
+      "description": "A fictional placeholder representing the future interpretation view."
+    },
+    {
+      "id": "sample-explore",
+      "title": "Explore",
+      "description": "A fictional placeholder representing the future recommendation view."
+    }
+  ]
+}
