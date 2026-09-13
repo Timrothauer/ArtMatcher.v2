@@ -102,7 +102,20 @@ button:focus-visible, a:focus-visible, summary:focus-visible {
 }
 
 .product-heading h1 { margin: 12px 0 20px; font: inherit; }
-.product-heading > p:last-child { max-width: 580px; margin: 0; color: var(--muted); font: 400 clamp(1rem, 2vw, 1.2rem)/1.55 Georgia, "Times New Roman", serif; }
+.product-tagline {
+  position: static;
+  display: block;
+  width: min(100%, 580px);
+  margin: 0;
+  color: var(--muted);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  font-weight: 400;
+  line-height: 1.55;
+  letter-spacing: normal;
+  word-spacing: normal;
+  white-space: normal;
+}
 .wordmark { color: var(--ink); text-decoration: none; }
 .wordmark span { margin-right: 0.35em; }
 
@@ -347,6 +360,14 @@ button:disabled { cursor: wait; opacity: 0.55; }
   .quiz-heading { margin-bottom: 20px; }
   .question { font-size: clamp(2rem, 4vw, 3.2rem); }
   .comparison-actions { margin-top: 22px; }
+}
+
+@media (min-width: 681px) and (max-height: 620px) {
+  body[data-stage="welcome"] .workspace { padding-top: 28px; }
+  body[data-stage="welcome"] .product-heading {
+    margin-bottom: 34px;
+    font-size: clamp(3.25rem, 16vh, 5rem);
+  }
 }
 
 @media (max-width: 680px) {
