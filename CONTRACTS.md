@@ -49,6 +49,8 @@ The Phase 0 sample record remains:
 
 The Phase 1 artwork contract remains unchanged and includes every documented metadata key plus all twelve concept-score keys. `quizRole` is exactly `quiz`, `recommendation`, or `holdout`.
 
+Artwork display metadata follows these permanent formatting rules: `artist` contains concise named creators or `""` without nationality, lifespan, or birth/death prose; `yearLabel` uses `c.` for approximation, `BCE`/`CE` for eras, and en dashes for ranges; `cultureOrRegion` uses a stable broad place label, with a documented culture in parentheses when useful. Original institutional wording remains available through `sourceUrl` and is not reconstructed or invented when a display value is missing.
+
 `data/embeddings.json` remains `{ metadata, embeddings }`. `metadata` includes `package`, `packageVersion`, `checkpoint`, `revision`, `dtype`, `dimension`, `normTolerance`, `promptVersion`, `conceptGroups`, `imageHashes`, and `generatedAt`. `embeddings` maps every stable artwork ID to one normalized finite numeric array.
 
 `source.load({ dataset: "profiler" })` returns:

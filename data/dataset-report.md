@@ -43,7 +43,7 @@ Period bands use the normalized start year:
 | 1800–1944 | 18 |
 | 1945–present | 0 |
 
-The exact normalized culture/region field contains France (5), Netherlands (3), Japan (3), America (2), France—19th century (2), and one each for the other recorded fields: Asante/West Africa, late-19th/early-20th-century America, Chimú, England, 20th-century France, Germany, Edo-period Japan, Joseon Korea, Moche, Nola, Nuremberg, north-coast Peru/Moche, south-coast Peru/Nasca, and Roman. Seven records have no source-supplied culture/region value.
+The normalized culture/region field contains France (8), Japan (4), Netherlands (3), United States (3), Germany (2), Peru (Moche) (2), and one each for England, Ghana (Asante), Italy (Nola), Korea (Joseon), Peru (Chimú), Peru (Nasca), and Roman. Seven records have no source-supplied culture/region value. Period qualifiers and source-specific word order are removed from this display field so equivalent regions aggregate consistently.
 
 ## Images and metadata
 
@@ -53,8 +53,10 @@ The exact normalized culture/region field contains France (5), Netherlands (3), 
 - File-size range: 36,614–828,447 bytes.
 - Total local image size: 10,552,310 bytes (about 10.1 MiB).
 - Missing title, date, medium, alt text, source URL, or rights statement: 0.
-- Missing artist/maker: 9; these are anonymous or source-unattributed objects and are shown as “Creator not recorded.”
+- Missing artist/maker: 11; these are anonymous, source-unattributed, or identified only by a broad geographic attribution and are shown as “Creator not recorded.”
 - Missing culture/region: 7; no value was invented.
+
+Display labels use a consistent compact format: named creators omit nationality and lifespan biographies, approximate dates use `c.`, eras use `BCE` and `CE`, numeric ranges use en dashes, and culture-qualified regions use `Place (Culture)`.
 
 Stable artwork IDs, `source + sourceId`, local paths, embedding keys, and exact image hashes are unique. Title-plus-artist review and visual contact-sheet review found no duplicate work. The validator confirms that all official source URLs are syntactically valid and all local images decode.
 
@@ -74,11 +76,11 @@ All 36 vectors contain only finite numbers, have dimension 512, and pass the doc
 
 | ID | Work and official source | Artist / maker | Date | Institution | Rights / credit |
 | --- | --- | --- | --- | --- | --- |
-| aic-11143 | [The Fear of Love](https://www.artic.edu/artworks/11143) | Jean Louis Lemoyne (French, 1665–1755) | 1742 | Art Institute of Chicago | Public Domain. Richard T. Crane, Jr. Endowment |
-| aic-116363 | [Field Armor for Man](https://www.artic.edu/artworks/116363) | South German, Nuremberg | c. 1520 | Art Institute of Chicago | Public Domain. George F. Harding Collection |
-| aic-2102 | [The Elephant, from The Berain Grotesques Series](https://www.artic.edu/artworks/2102) | After Jean Baptiste Monnoyer and Jean I Berain; woven at Beauvais | c. 1688/1732 | Art Institute of Chicago | Public Domain. Robert Allerton Endowment |
-| aic-253 | [Hydria (Water Jar)](https://www.artic.edu/artworks/253) | Greek; possibly Apulia or Campania, Italy | about 300 BCE | Art Institute of Chicago | Public Domain. Museum Purchase Fund |
-| aic-27992 | [A Sunday on La Grande Jatte — 1884](https://www.artic.edu/artworks/27992) | Georges Seurat | 1884–86, border added 1888–89 | Art Institute of Chicago | Public Domain. Helen Birch Bartlett Memorial Collection |
+| aic-11143 | [The Fear of Love](https://www.artic.edu/artworks/11143) | Jean Louis Lemoyne | 1742 | Art Institute of Chicago | Public Domain. Richard T. Crane, Jr. Endowment |
+| aic-116363 | [Field Armor for Man](https://www.artic.edu/artworks/116363) | Creator not recorded | c. 1520 | Art Institute of Chicago | Public Domain. George F. Harding Collection |
+| aic-2102 | [The Elephant, from The Berain Grotesques Series](https://www.artic.edu/artworks/2102) | Jean Baptiste Monnoyer; Jean I Berain; Manufacture Royale de Beauvais | c. 1688–1732 | Art Institute of Chicago | Public Domain. Robert Allerton Endowment |
+| aic-253 | [Hydria (Water Jar)](https://www.artic.edu/artworks/253) | Creator not recorded | c. 300 BCE | Art Institute of Chicago | Public Domain. Museum Purchase Fund |
+| aic-27992 | [A Sunday on La Grande Jatte — 1884](https://www.artic.edu/artworks/27992) | Georges Seurat | 1884–1886, border added 1888–1889 | Art Institute of Chicago | Public Domain. Helen Birch Bartlett Memorial Collection |
 | aic-29230 | [Julia Jackson](https://www.artic.edu/artworks/29230) | Julia Margaret Cameron | 1867 | Art Institute of Chicago | Public Domain. Harriott A. Fox Endowment |
 | aic-5150 | [Summer: Planting Rice](https://www.artic.edu/artworks/5150) | Torii Kiyomasu II | c. 1730s | Art Institute of Chicago | Public Domain. Japanese Print Purchase Fund |
 | aic-65821 | [Composition (No. 1) Gray-Red](https://www.artic.edu/artworks/65821) | Piet Mondrian | 1935 | Art Institute of Chicago | Public Domain. Gift of Mrs. Gilbert W. Chapman |
@@ -97,24 +99,24 @@ All 36 vectors contain only finite numbers, have dimension 512, and pass the doc
 | cma-165269 | [Textile Fragment](https://www.clevelandart.org/art/2007.2.3) | Creator not recorded | c. 50–650 CE | Cleveland Museum of Art | CC0. John L. Severance Fund |
 | cma-171296 | [Vale of Kashmir](https://www.clevelandart.org/art/2014.12) | Robert S. Duncanson | 1867 | Cleveland Museum of Art | CC0. Sundry Purchase Fund |
 | cma-93239 | [Still Life](https://www.clevelandart.org/art/1926.1664) | Preston Dickinson | c. 1924 | Cleveland Museum of Art | CC0. Hinman B. Hurlbut Collection |
-| cma-98627 | [The Age of Bronze](https://www.clevelandart.org/art/1918.328) | Auguste Rodin | 1875–76 | Cleveland Museum of Art | CC0. Gift of Mr. and Mrs. Ralph King |
-| met-248899 | [Ten marble fragments of the Great Eleusinian Relief](https://www.metmuseum.org/art/collection/search/248899) | Creator not recorded | ca. 27 BCE–14 CE | The Metropolitan Museum of Art | Public Domain. Rogers Fund, 1914 |
+| cma-98627 | [The Age of Bronze](https://www.clevelandart.org/art/1918.328) | Auguste Rodin | 1875–1876 | Cleveland Museum of Art | CC0. Gift of Mr. and Mrs. Ralph King |
+| met-248899 | [Ten marble fragments of the Great Eleusinian Relief](https://www.metmuseum.org/art/collection/search/248899) | Creator not recorded | c. 27 BCE–14 CE | The Metropolitan Museum of Art | Public Domain. Rogers Fund, 1914 |
 | met-315786 | [Shirt](https://www.metmuseum.org/art/collection/search/315786) | Moche artist(s) | 500–850 CE | The Metropolitan Museum of Art | Public Domain. Bequest of Jane Costello Goldberg, 1986 |
 | met-317700 | [Mirror Frame](https://www.metmuseum.org/art/collection/search/317700) | Creator not recorded | 10th–15th century | The Metropolitan Museum of Art | Public Domain. Gift of Carol R. Meyer, 1994 |
-| met-329077 | [Head of a ruler](https://www.metmuseum.org/art/collection/search/329077) | Creator not recorded | ca. 2300–2000 BCE | The Metropolitan Museum of Art | Public Domain. Rogers Fund, 1947 |
-| met-435658 | [Madonna and Child](https://www.metmuseum.org/art/collection/search/435658) | Berlinghiero | possibly 1230s | The Metropolitan Museum of Art | Public Domain. Gift of Irma N. Straus, 1960 |
+| met-329077 | [Head of a ruler](https://www.metmuseum.org/art/collection/search/329077) | Creator not recorded | c. 2300–2000 BCE | The Metropolitan Museum of Art | Public Domain. Rogers Fund, 1947 |
+| met-435658 | [Madonna and Child](https://www.metmuseum.org/art/collection/search/435658) | Berlinghiero | c. 1230s | The Metropolitan Museum of Art | Public Domain. Gift of Irma N. Straus, 1960 |
 | met-436105 | [The Death of Socrates](https://www.metmuseum.org/art/collection/search/436105) | Jacques Louis David | 1787 | The Metropolitan Museum of Art | Public Domain. Catharine Lorillard Wolfe Collection, 1931 |
 | met-436532 | [Self-Portrait with a Straw Hat](https://www.metmuseum.org/art/collection/search/436532) | Vincent van Gogh | 1887 | The Metropolitan Museum of Art | Public Domain. Bequest of Miss Adelaide Milton de Groot, 1967 |
 | met-436535 | [Wheat Field with Cypresses](https://www.metmuseum.org/art/collection/search/436535) | Vincent van Gogh | 1889 | The Metropolitan Museum of Art | Public Domain. Purchase, The Annenberg Foundation Gift, 1993 |
-| met-437853 | [Venice, from the Porch of Madonna della Salute](https://www.metmuseum.org/art/collection/search/437853) | Joseph Mallord William Turner | ca. 1835 | The Metropolitan Museum of Art | Public Domain. Bequest of Cornelius Vanderbilt, 1899 |
+| met-437853 | [Venice, from the Porch of Madonna della Salute](https://www.metmuseum.org/art/collection/search/437853) | Joseph Mallord William Turner | c. 1835 | The Metropolitan Museum of Art | Public Domain. Bequest of Cornelius Vanderbilt, 1899 |
 | met-44858 | [Old Plum](https://www.metmuseum.org/art/collection/search/44858) | Kano Sansetsu | 1646 | The Metropolitan Museum of Art | Public Domain. The Harry G. C. Packard Collection, 1975 |
-| met-45434 | [Under the Wave off Kanagawa (The Great Wave)](https://www.metmuseum.org/art/collection/search/45434) | Katsushika Hokusai | ca. 1830–32 | The Metropolitan Museum of Art | Public Domain. H. O. Havemeyer Collection, 1929 |
-| met-544227 | [Hippopotamus ("William")](https://www.metmuseum.org/art/collection/search/544227) | Creator not recorded | ca. 1961–1878 BCE | The Metropolitan Museum of Art | Public Domain. Gift of Edward S. Harkness, 1917 |
+| met-45434 | [Under the Wave off Kanagawa (The Great Wave)](https://www.metmuseum.org/art/collection/search/45434) | Katsushika Hokusai | c. 1830–1832 | The Metropolitan Museum of Art | Public Domain. H. O. Havemeyer Collection, 1929 |
+| met-544227 | [Hippopotamus ("William")](https://www.metmuseum.org/art/collection/search/544227) | Creator not recorded | c. 1961–1878 BCE | The Metropolitan Museum of Art | Public Domain. Gift of Edward S. Harkness, 1917 |
 
 ## Known limitations
 
 - Open-access rights and image availability constrain the sample. The final catalog has no postwar or contemporary work, so it cannot represent those periods responsibly.
 - Painting is more frequent than photography and works on paper; role assignment preserves variety but cannot remove every medium imbalance.
-- Seven culture/region values and nine artist/maker values are absent in the institutional metadata; the app uses neutral missing-value language.
+- Seven culture/region values and eleven artist/maker values are absent or not specific enough for a named-creator label; the app uses neutral missing-value language.
 - CLIP concept scores can reflect model and prompt bias. They are used as cautious, inspectable signals and must not be treated as authoritative art-historical classification.
 - The image-preparation dependency tree currently reports two high-severity advisories in its transitive `sharp` package with no available package-manager fix. The dependency runs only during trusted local preparation and is not loaded by the deployed browser.

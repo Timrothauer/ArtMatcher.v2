@@ -45,3 +45,4 @@ Run every numbered check before a phase checkpoint.
 41. Confirm **Test My Profile** and **Start Over** appear immediately below the result summary, while detailed score, factual, and representative evidence is available under **How this profile was calculated**.
 42. Confirm the home wordmark returns to a clean welcome screen and the skip link becomes visible when focused.
 43. At a 796×439 CSS viewport (or a 1592×878 Retina capture), confirm the hero tagline has normal letter and word spacing and never overlaps itself or the headline.
+44. Run dataset validation and confirm every artist, year, and culture/region value follows the documented display-label format; spot-check multi-creator, approximate-date, BCE/CE, missing-creator, and culture-qualified records in the reveal and result views.
