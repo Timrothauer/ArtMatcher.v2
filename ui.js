@@ -55,7 +55,8 @@ function artworkFacts(artwork) {
   facts.append(element("h3", "", artwork.title));
   const creator = artwork.artist || "Creator not recorded";
   const date = artwork.yearLabel || "Date not recorded";
-  facts.append(element("p", "artwork-credit", `${creator} · ${date}`));
+  const region = artwork.cultureOrRegion || "Region not recorded";
+  facts.append(element("p", "artwork-credit", `${creator} · ${date} · ${region}`));
   if (artwork.medium) facts.append(element("p", "artwork-medium", artwork.medium));
   const sourceLink = element("a", "source-link", `View at ${artwork.source}`);
   sourceLink.href = artwork.sourceUrl;
