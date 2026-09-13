@@ -21,6 +21,7 @@ import {
   renderReveal,
   renderWelcome,
   setBusy,
+  setDiagnosticsVisible,
   setStatus,
   showEmpty,
   showError
@@ -142,9 +143,20 @@ function recordQuizChoice(choice) {
     choice,
     round,
     onContinue: continueAfterReveal,
+    onChange: changeQuizChoice,
     onFinish: round === "adaptive" && state.adaptiveCount >= config.minimumAdaptiveAnswers ? finishQuiz : null
   });
   setStatus(choice === "neither" ? "Response recorded as Neither / Unsure." : "Choice recorded. Artwork details revealed.");
+}
+
+function changeQuizChoice() {
+  if (state.stage !== "reveal") return;
+  const answer = state.answers[state.answers.length - 1];
+  if (!answer || answer.pairId !== state.currentPair?.id) return;
+  state.answers.pop();
+  if (state.currentRound === "adaptive") state.adaptiveCount -= 1;
+  showQuizPair(state.currentPair, state.currentRound);
+  setStatus("Choose again. Your previous response to this pair was removed.");
 }
 
 function handleQuizImageFailure(pairId, artworkId) {
@@ -275,7 +287,7 @@ function continueChallenge() {
 function restart() {
   state = createInitialState();
   data = null;
-  renderWelcome(startQuiz);
+  renderWelcome(startQuiz, { focusHeading: true });
   setStatus("Ready to discover your taste.");
 }
 
@@ -322,4 +334,6 @@ window.addEventListener("keydown", (event) => {
   }
 });
 
+const diagnosticsRequested = new URLSearchParams(window.location.search).get("diagnostics") === "1";
+setDiagnosticsVisible(config.featureFlags.diagnostics || diagnosticsRequested);
 renderWelcome(startQuiz);

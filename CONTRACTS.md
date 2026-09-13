@@ -26,7 +26,7 @@ These seams are permanent from Phase 0 onward. Missing string values use `""`, m
 - `renderList(items)`
 - `clearResults()`
 
-Phase 1 additively introduced `renderWelcome`, `renderComparison`, `renderReveal`, and `renderResults`. Phase 2 additively introduces `renderRefinementIntro`, `renderChallengeComparison`, `renderChallengeReveal`, and `renderChallengeSummary`. All visible state and DOM mutation remains in `ui.js`.
+Phase 1 additively introduced `renderWelcome`, `renderComparison`, `renderReveal`, and `renderResults`. Phase 2 additively introduced `renderRefinementIntro`, `renderChallengeComparison`, `renderChallengeReveal`, and `renderChallengeSummary`. The post-Phase 2 UX pass additively introduces `setDiagnosticsVisible`; foundation controls retain every stable ID but are hidden unless `?diagnostics=1` is present or the configuration flag is enabled. All visible state and DOM mutation remains in `ui.js`.
 
 ## Data source methods
 

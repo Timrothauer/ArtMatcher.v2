@@ -1,10 +1,19 @@
 const controlsRegion = document.querySelector("#controls-region");
 const statusLine = document.querySelector("#status-line");
 const viewRegion = document.querySelector("#view-region");
+const foundationChecks = document.querySelector(".foundation-checks");
 
-function replaceView(node) {
+function replaceView(node, { focusHeading = true } = {}) {
   viewRegion.replaceChildren(node);
-  window.scrollTo({ top: 0, behavior: "smooth" });
+  if (focusHeading) {
+    const heading = node.querySelector("h2");
+    if (heading) {
+      heading.tabIndex = -1;
+      heading.focus({ preventScroll: true });
+    }
+  }
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  window.scrollTo({ top: 0, behavior: reducedMotion ? "auto" : "smooth" });
 }
 
 function element(tag, className, text) {
@@ -97,17 +106,37 @@ export function clearResults() {
   viewRegion.replaceChildren();
 }
 
-export function renderWelcome(onStart) {
+export function setDiagnosticsVisible(isVisible) {
+  foundationChecks.hidden = !isVisible;
+}
+
+export function renderWelcome(onStart, { focusHeading = false } = {}) {
   document.body.dataset.stage = "welcome";
   const welcome = element("section", "welcome-view");
   welcome.append(
-    element("p", "eyebrow", "Eight opening choices · Six focused follow-ups"),
+    element("p", "eyebrow", "11–14 comparisons · About 3 minutes"),
     element("h2", "welcome-title", "Which images stay with you?"),
     element("p", "welcome-copy", "Choose between artworks and receive a cautious snapshot of the visual qualities you seem drawn to. No art-history knowledge is needed."),
     makeButton("Discover My Taste", "primary-action discover-action", onStart),
     element("p", "experiment-note", "This is an experimental taste snapshot, not a psychological assessment or permanent description of you.")
   );
-  replaceView(welcome);
+  replaceView(welcome, { focusHeading });
+}
+
+function openArtworkPreview(artwork, side, context, onChoose) {
+  const dialog = element("dialog", "art-preview-dialog");
+  const closeButton = makeButton("Close", "text-action preview-close", () => dialog.close());
+  const heading = element("h2", "preview-title", `${context[0].toUpperCase()}${context.slice(1)} on the ${side}`);
+  const image = artworkImage(artwork, `${context[0].toUpperCase()}${context.slice(1)} option on the ${side}`, "preview-image");
+  const chooseButton = makeButton("Choose This Work", "primary-action preview-choose", () => {
+    dialog.close();
+    onChoose(side);
+  });
+  dialog.append(closeButton, heading, image, element("p", "preview-note", "Artwork details stay hidden until you make your choice."), chooseButton);
+  dialog.addEventListener("close", () => dialog.remove(), { once: true });
+  document.body.append(dialog);
+  dialog.showModal();
+  closeButton.focus();
 }
 
 function comparisonOption(artwork, side, onChoose, onImageError, context = "artwork") {
@@ -122,12 +151,21 @@ function comparisonOption(artwork, side, onChoose, onImageError, context = "artw
   return button;
 }
 
+function comparisonPreviewActions(left, right, onChoose, context = "artwork") {
+  const actions = element("div", "image-zoom-actions");
+  actions.append(
+    makeButton("View left work larger", "text-action image-zoom-action", () => openArtworkPreview(left, "left", context, onChoose)),
+    makeButton("View right work larger", "text-action image-zoom-action", () => openArtworkPreview(right, "right", context, onChoose))
+  );
+  return actions;
+}
+
 export function renderComparison({ left, right, index, total, round, onChoose, onFinish, onImageError }) {
   document.body.dataset.stage = round === "Refinement" ? "adaptive" : "quiz";
   const view = element("section", "quiz-view");
   const heading = element("div", "quiz-heading");
   heading.append(
-    element("p", "progress-label", `${round} ${index + 1} of ${total}`),
+    element("p", "progress-label", round === "Refinement" ? `${round} ${index + 1} of up to ${total}` : `${round} ${index + 1} of ${total}`),
     element("h2", "question", "Which work are you more drawn to?"),
     element("p", "keyboard-hint", "Use the buttons, ← or →. Press N for Neither / Unsure.")
   );
@@ -140,9 +178,8 @@ export function renderComparison({ left, right, index, total, round, onChoose, o
   const actions = element("div", "comparison-actions");
   actions.append(makeButton("Neither / Unsure", "neither-action", () => onChoose("neither")));
   if (onFinish) actions.append(makeButton("Finish Now", "text-action finish-action", onFinish));
-  view.append(heading, pair, actions);
+  view.append(heading, pair, comparisonPreviewActions(left, right, onChoose), actions);
   replaceView(view);
-  view.querySelector(".artwork-option")?.focus();
 }
 
 export function renderRefinementIntro(onContinue) {
@@ -155,7 +192,6 @@ export function renderRefinementIntro(onContinue) {
     makeButton("Begin Refinement", "primary-action refinement-action", onContinue)
   );
   replaceView(view);
-  view.querySelector(".refinement-action")?.focus();
 }
 
 function revealedArtwork(artwork, markers = []) {
@@ -165,7 +201,7 @@ function revealedArtwork(artwork, markers = []) {
   return card;
 }
 
-export function renderReveal({ left, right, choice, round, onContinue, onFinish }) {
+export function renderReveal({ left, right, choice, round, onContinue, onChange, onFinish }) {
   document.body.dataset.stage = "reveal";
   const view = element("section", "reveal-view");
   view.append(element("p", "eyebrow", choice === "neither" ? "No direction added" : round === "adaptive" ? "Refinement recorded" : "Choice recorded"));
@@ -176,11 +212,13 @@ export function renderReveal({ left, right, choice, round, onContinue, onFinish 
     revealedArtwork(right, [choice === "right" ? "Your choice" : ""])
   );
   const actions = element("div", "reveal-actions");
-  actions.append(makeButton("Continue", "primary-action continue-action", onContinue));
+  actions.append(
+    makeButton("Continue", "primary-action continue-action", onContinue),
+    makeButton("Change My Choice", "secondary-action change-choice-action", onChange)
+  );
   if (onFinish) actions.append(makeButton("Finish Now", "secondary-action finish-action", onFinish));
   view.append(cards, actions);
   replaceView(view);
-  view.querySelector(".continue-action")?.focus();
 }
 
 function confidenceDescription(signal) {
@@ -310,7 +348,18 @@ export function renderResults(result, { onRestart, onChallenge }) {
     element("p", "evidence-count", `${result.directionalCount} directional choices · ${result.neitherCount} inconclusive`)
   );
 
-  view.append(renderScorecard(result.attributeResults), renderSignalSection(result));
+  const actions = element("div", "result-actions result-actions--primary");
+  actions.append(
+    makeButton("Test My Profile", "primary-action challenge-action", onChallenge),
+    makeButton("Start Over", "secondary-action restart-action", onRestart)
+  );
+  view.append(actions, renderSignalSection(result));
+
+  if (result.recommendations.length) view.append(renderRecommendations(result.recommendations));
+
+  const details = element("details", "result-details");
+  details.append(element("summary", "result-details-summary", "How this profile was calculated"));
+  details.append(renderScorecard(result.attributeResults));
 
   const mixedSection = element("section", "result-section mixed-section");
   mixedSection.append(
@@ -319,7 +368,7 @@ export function renderResults(result, { onRestart, onChallenge }) {
       ? `The evidence is mixed for ${result.mixed.map((signal) => signal.dimension.toLowerCase()).join(", ")}. The scorecard leaves these dimensions unclear rather than forcing a label.`
       : "No major dimension is currently marked as mixed, though this remains a small and bounded sample.")
   );
-  view.append(mixedSection, renderFactualSection(result.factualTendencies));
+  details.append(mixedSection, renderFactualSection(result.factualTendencies));
 
   if (result.representativeChoices.length) {
     const choices = element("section", "result-section");
@@ -329,17 +378,10 @@ export function renderResults(result, { onRestart, onChallenge }) {
       pair.append(resultArtwork(choice.chosen, "Chosen"), resultArtwork(choice.rejected, "Not chosen"));
       choices.append(pair);
     });
-    view.append(choices);
+    details.append(choices);
   }
 
-  if (result.recommendations.length) view.append(renderRecommendations(result.recommendations));
-
-  const actions = element("div", "result-actions");
-  actions.append(
-    makeButton("Test My Profile", "primary-action challenge-action", onChallenge),
-    makeButton("Start Over", "secondary-action restart-action", onRestart)
-  );
-  view.append(actions);
+  view.append(details);
   replaceView(view);
 }
 
@@ -356,9 +398,8 @@ export function renderChallengeComparison({ left, right, index, total, onChoose,
     comparisonOption(left, "left", onChoose, onImageError, "held-out artwork"),
     comparisonOption(right, "right", onChoose, onImageError, "held-out artwork")
   );
-  view.append(grid, makeButton("Neither / Unsure", "neither-action", () => onChoose("neither")));
+  view.append(grid, comparisonPreviewActions(left, right, onChoose, "held-out artwork"), makeButton("Neither / Unsure", "neither-action", () => onChoose("neither")));
   replaceView(view);
-  view.querySelector(".artwork-option")?.focus();
 }
 
 export function renderChallengeReveal({ left, right, predictionId, choice, agreed, unavailable, onContinue }) {
@@ -375,7 +416,6 @@ export function renderChallengeReveal({ left, right, predictionId, choice, agree
   );
   view.append(grid, makeButton("Continue", "primary-action continue-action", onContinue));
   replaceView(view);
-  view.querySelector(".continue-action")?.focus();
 }
 
 export function renderChallengeSummary(summary, { onRestart, onResults }) {

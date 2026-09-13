@@ -7,12 +7,11 @@
     <title>Art Taste Profiler</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='8' fill='%2317212b'/%3E%3Ccircle cx='24' cy='25' r='11' fill='%23f3f0e8'/%3E%3Ccircle cx='42' cy='39' r='11' fill='%23a43d2d'/%3E%3C/svg%3E">
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="polish.css">
-    <link rel="stylesheet" href="phase2.css">
   </head>
   <body data-stage="welcome">
+    <a class="skip-link" href="#main-content">Skip to main content</a>
     <header class="site-header">
-      <a class="wordmark" href="#main-content" aria-label="Art Taste Profiler home">
+      <a class="wordmark" href="./" aria-label="Art Taste Profiler home — start over">
         <span aria-hidden="true">ATP</span>
         <strong>Art Taste Profiler</strong>
       </a>
@@ -29,10 +28,10 @@
       <section aria-labelledby="workspace-title">
         <h2 id="workspace-title" class="visually-hidden">Taste profiler</h2>
         <p id="status-line" class="status" role="status" aria-live="polite">Ready to discover your taste.</p>
-        <div id="view-region" class="view" aria-live="polite" aria-busy="false"></div>
+        <div id="view-region" class="view" aria-busy="false"></div>
       </section>
 
-      <details class="foundation-checks">
+      <details class="foundation-checks" hidden>
         <summary>Foundation state checks</summary>
         <p>These controls preserve the Phase 0 regression states.</p>
         <div id="controls-region" class="controls" aria-label="Foundation preview controls">

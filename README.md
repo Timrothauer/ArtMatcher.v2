@@ -15,6 +15,8 @@ python3 -m http.server 4173 --bind 127.0.0.1
 
 Then open `http://127.0.0.1:4173`. Opening `index.html` directly is unsupported because the browser fetches local JSON files.
 
+Foundation regression controls are intentionally hidden in the public experience. Add `?diagnostics=1` to the page URL when running the documented foundation checks.
+
 The deployed browser is a static HTML/CSS/JavaScript app. It uses committed local images and saved numeric outputs only; it does not load a model, call a museum API, store visitor choices, or require an API key.
 
 ## How the snapshot works

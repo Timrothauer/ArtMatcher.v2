@@ -27,7 +27,7 @@ export const config = Object.freeze({
   recommendationLimit: 4,
   representativeChoiceLimit: 3,
   challengePairCount: 3,
-  featureFlags: Object.freeze({ adaptiveQuiz: true, predictionChallenge: true, recommendations: true }),
+  featureFlags: Object.freeze({ adaptiveQuiz: true, predictionChallenge: true, recommendations: true, diagnostics: false }),
   conceptLabels: Object.freeze([
     "abstract / figurative",
     "minimal / visually dense",

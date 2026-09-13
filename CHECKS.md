@@ -3,7 +3,7 @@
 Run every numbered check before a phase checkpoint.
 
 1. Open the page and confirm it loads with no browser console errors.
-2. Expand **Foundation state checks**, activate **Load sample collection**, and confirm three visible sample results appear.
+2. Open the site with `?diagnostics=1`, expand **Foundation state checks**, activate **Load sample collection**, and confirm three visible sample results appear. Confirm the controls are hidden without the query parameter.
 3. Activate **Preview empty state** and confirm the empty-state message appears.
 4. Activate **Preview error state** and confirm a readable sentence appears without a stack trace or raw response.
 5. Activate any preview control and confirm the busy state appears, all controls disable, and controls re-enable when loading finishes.
@@ -38,3 +38,9 @@ Run every numbered check before a phase checkpoint.
 34. Emulate `prefers-reduced-motion: reduce` and confirm transitions are effectively removed while every state change remains understandable.
 35. Restart from the result and challenge screens and confirm all initial, adaptive, recommendation, prediction, and challenge state is cleared.
 36. Run the complete flow at the public Vercel URL and confirm it matches the validated local build.
+37. At a 1440×900 viewport, confirm both artworks and **Neither / Unsure** are visible without scrolling.
+38. On a reveal screen, activate **Change My Choice**, confirm the previous response is removed, and confirm choosing again does not duplicate the pair or progress count.
+39. On a 375px viewport, activate **View left work larger**, confirm a modal image opens, Escape closes it, and **Choose This Work** records the selection.
+40. Confirm each dynamic view focuses its heading without moving the page away from the top, and only the short status line uses `aria-live`.
+41. Confirm **Test My Profile** and **Start Over** appear immediately below the result summary, while detailed score, factual, and representative evidence is available under **How this profile was calculated**.
+42. Confirm the home wordmark returns to a clean welcome screen and the skip link becomes visible when focused.
