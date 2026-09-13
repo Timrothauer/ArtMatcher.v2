@@ -45,6 +45,8 @@ Period bands use the normalized start year:
 
 The normalized culture/region field contains France (8), Japan (4), Netherlands (3), United States (3), Germany (2), Peru (Moche) (2), and one each for England, Ghana (Asante), Italy (Nola), Korea (Joseon), Peru (Chimú), Peru (Nasca), and Roman. Seven records have no source-supplied culture/region value. Period qualifiers and source-specific word order are removed from this display field so equivalent regions aggregate consistently.
 
+Every record also has one concise movement/style label. The controlled vocabulary uses a named movement or school when one responsibly applies, and an established period style or cultural tradition for ancient and decorative objects rather than forcing those works into modern Western movements. Ukiyo-e appears 3 times; Dutch Golden Age, Moche, and Post-Impressionism appear twice each; the remaining 27 labels appear once each. Labels were checked against the official Art Institute of Chicago, Cleveland Museum of Art, and Metropolitan Museum of Art records, supplemented by established art-historical terminology where an institution supplied period, culture, or artist context rather than a dedicated style field.
+
 ## Images and metadata
 
 - Local images: 36/36 decoded successfully.
@@ -55,6 +57,7 @@ The normalized culture/region field contains France (8), Japan (4), Netherlands 
 - Missing title, date, medium, alt text, source URL, or rights statement: 0.
 - Missing artist/maker: 11; these are anonymous, source-unattributed, or identified only by a broad geographic attribution and are shown as “Creator not recorded.”
 - Missing culture/region: 7; no value was invented.
+- Missing movement/style: 0; each label identifies a documented movement, school, period style, or cultural tradition.
 
 Display labels use a consistent compact format: named creators omit nationality and lifespan biographies, approximate dates use `c.`, eras use `BCE` and `CE`, numeric ranges use en dashes, and culture-qualified regions use `Place (Culture)`.
 
@@ -118,5 +121,6 @@ All 36 vectors contain only finite numbers, have dimension 512, and pass the doc
 - Open-access rights and image availability constrain the sample. The final catalog has no postwar or contemporary work, so it cannot represent those periods responsibly.
 - Painting is more frequent than photography and works on paper; role assignment preserves variety but cannot remove every medium imbalance.
 - Seven culture/region values and eleven artist/maker values are absent or not specific enough for a named-creator label; the app uses neutral missing-value language.
+- Movement/style labels necessarily combine modern movements with schools, period styles, and cultural traditions because the catalog spans paintings, photographs, armor, textiles, ceramics, and ancient objects. They are concise browsing labels, not claims that all art traditions share one taxonomy.
 - CLIP concept scores can reflect model and prompt bias. They are used as cautious, inspectable signals and must not be treated as authoritative art-historical classification.
 - The image-preparation dependency tree currently reports two high-severity advisories in its transitive `sharp` package with no available package-manager fix. The dependency runs only during trusted local preparation and is not loaded by the deployed browser.

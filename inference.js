@@ -86,7 +86,8 @@ function metadataNovelty(artwork, displayed) {
   const comparisons = [
     [mediumGroup(artwork.medium), (item) => mediumGroup(item.medium)],
     [periodBand(artwork.yearStart), (item) => periodBand(item.yearStart)],
-    [artwork.cultureOrRegion || "", (item) => item.cultureOrRegion || ""]
+    [artwork.cultureOrRegion || "", (item) => item.cultureOrRegion || ""],
+    [artwork.movementOrStyle || "", (item) => item.movementOrStyle || ""]
   ];
   const valid = comparisons.filter(([value]) => value);
   if (!valid.length) return 0;
@@ -219,7 +220,8 @@ function factualValues(artwork) {
   return [
     { dimension: "Medium", value: mediumGroup(artwork.medium) },
     { dimension: "Period", value: periodBand(artwork.yearStart) },
-    { dimension: "Culture or region", value: artwork.cultureOrRegion || "" }
+    { dimension: "Culture or region", value: artwork.cultureOrRegion || "" },
+    { dimension: "Movement or style", value: artwork.movementOrStyle || "" }
   ];
 }
 
@@ -233,21 +235,26 @@ export function summarizeFactualTendencies(answers, artworks, config) {
     for (const item of factualValues(chosen)) {
       if (!item.value) continue;
       const key = `${item.dimension}\u0000${item.value}`;
-      const record = records.get(key) ?? { dimension: item.dimension, value: item.value, selected: 0, rejected: 0, exposure: 0 };
-      record.selected += 1;
-      record.exposure += 1;
+      const record = records.get(key) ?? { dimension: item.dimension, value: item.value, selectedArtworkIds: new Set(), rejectedArtworkIds: new Set() };
+      record.selectedArtworkIds.add(chosen.id);
       records.set(key, record);
     }
     for (const item of factualValues(rejected)) {
       if (!item.value) continue;
       const key = `${item.dimension}\u0000${item.value}`;
-      const record = records.get(key) ?? { dimension: item.dimension, value: item.value, selected: 0, rejected: 0, exposure: 0 };
-      record.rejected += 1;
-      record.exposure += 1;
+      const record = records.get(key) ?? { dimension: item.dimension, value: item.value, selectedArtworkIds: new Set(), rejectedArtworkIds: new Set() };
+      record.rejectedArtworkIds.add(rejected.id);
       records.set(key, record);
     }
   }
   return [...records.values()]
+    .map((record) => ({
+      dimension: record.dimension,
+      value: record.value,
+      selected: record.selectedArtworkIds.size,
+      rejected: record.rejectedArtworkIds.size,
+      exposure: new Set([...record.selectedArtworkIds, ...record.rejectedArtworkIds]).size
+    }))
     .filter((record) => record.exposure >= config.minimumFactualExposure && record.selected !== record.rejected)
     .map((record) => {
       const net = record.selected - record.rejected;
@@ -320,7 +327,15 @@ export function createTasteResult(answers, artworks, embeddings, config) {
   const attributeResults = summarizeConcepts(answers, artworks, config.conceptGroups, config);
   const supported = attributeResults.filter((result) => !result.mixed).sort((first, second) => second.strength - first.strength || first.dimension.localeCompare(second.dimension)).slice(0, config.resultLimit);
   const mixed = attributeResults.filter((result) => result.mixed).sort((first, second) => first.strength - second.strength || first.dimension.localeCompare(second.dimension));
-  const factualTendencies = summarizeFactualTendencies(answers, artworks, config).slice(0, 4);
+  const allFactualTendencies = summarizeFactualTendencies(answers, artworks, config);
+  const preferredMovementStyles = allFactualTendencies
+    .filter((item) => item.dimension === "Movement or style" && item.direction === "favored")
+    .slice(0, 2);
+  const preferredStyleKeys = new Set(preferredMovementStyles.map((item) => `${item.dimension}\u0000${item.value}`));
+  const factualTendencies = [
+    ...preferredMovementStyles,
+    ...allFactualTendencies.filter((item) => !preferredStyleKeys.has(`${item.dimension}\u0000${item.value}`))
+  ].slice(0, 4);
   const profile = insufficient ? { name: config.fallbackProfileName, attributes: [] } : chooseProfileName(attributeResults, config);
   const recommendations = insufficient ? [] : rankRecommendations(artworks, embeddings, preferenceVector, attributeResults, factualTendencies, config);
   const artworkById = new Map(artworks.map((artwork) => [artwork.id, artwork]));
@@ -343,6 +358,7 @@ export function createTasteResult(answers, artworks, embeddings, config) {
     representativeChoices,
     attributeResults,
     factualTendencies,
+    preferredMovementStyles,
     profileName: profile.name,
     profileAttributes: profile.attributes,
     recommendations,

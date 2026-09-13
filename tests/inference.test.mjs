@@ -9,6 +9,7 @@ import {
   contributionForAnswer,
   createChallenge,
   createInitialState,
+  createTasteResult,
   normalizeVector,
   pairKey,
   preferenceFromAnswers,
@@ -64,6 +65,7 @@ function artwork(id, quizRole = "quiz", extra = {}) {
     medium: "Oil on canvas",
     yearStart: 1900,
     cultureOrRegion: "Test region",
+    movementOrStyle: "Test style",
     conceptScores: {
       abstract: 0.8, figurative: 0.2,
       minimal: 0.7, visuallyDense: 0.3,
@@ -111,9 +113,29 @@ test("confidence mapping has only Emerging, Moderate, and Strong labels", () => 
 });
 
 test("missing factual metadata is neutral", () => {
-  const works = [artwork("a", "quiz", { medium: "", yearStart: null, cultureOrRegion: "" }), artwork("b", "quiz", { medium: "", yearStart: null, cultureOrRegion: "" })];
+  const works = [artwork("a", "quiz", { medium: "", yearStart: null, cultureOrRegion: "", movementOrStyle: "" }), artwork("b", "quiz", { medium: "", yearStart: null, cultureOrRegion: "", movementOrStyle: "" })];
   const answers = [{ choice: "left", chosenId: "a", rejectedId: "b" }];
   assert.deepEqual(summarizeFactualTendencies(answers, works, config), []);
+});
+
+test("movement or style preference requires repeated directional evidence", () => {
+  const works = [
+    artwork("a", "quiz", { movementOrStyle: "Expressionism" }),
+    artwork("b", "quiz", { movementOrStyle: "Expressionism" }),
+    artwork("c", "quiz", { movementOrStyle: "Rococo" }),
+    artwork("d", "quiz", { movementOrStyle: "Rococo" })
+  ];
+  const answers = [
+    { pairId: "pair-1", choice: "left", chosenId: "a", rejectedId: "c" },
+    { pairId: "pair-2", choice: "left", chosenId: "b", rejectedId: "d" }
+  ];
+  const tendencies = summarizeFactualTendencies(answers, works, config);
+  assert.equal(tendencies.find((item) => item.dimension === "Movement or style" && item.value === "Expressionism")?.direction, "favored");
+  const embeddings = { a: [1, 0], b: [1, 0], c: [0, 1], d: [0, 1] };
+  const result = createTasteResult(answers, works, embeddings, config);
+  assert.deepEqual(result.preferredMovementStyles.map((item) => item.value), ["Expressionism"]);
+  const repeatedSinglePair = [answers[0], { ...answers[0], pairId: "pair-repeat" }];
+  assert.equal(summarizeFactualTendencies(repeatedSinglePair, works, config).some((item) => item.dimension === "Movement or style"), false);
 });
 
 test("controlled profile mapping uses a documented rule and mixed fallback", () => {

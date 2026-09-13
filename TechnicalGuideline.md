@@ -195,6 +195,7 @@ The normalized artwork contract must support:
   yearEnd: 1886,
   medium: "Oil on canvas",
   cultureOrRegion: "France",
+  movementOrStyle: "Neo-Impressionism",
   department: "Painting and Sculpture of Europe",
   originalImageUrl: "https://institution.example/image.jpg",
   imagePath: "assets/artworks/aic-27992.jpg",

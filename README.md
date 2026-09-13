@@ -29,7 +29,7 @@ The result combines:
 
 - visual similarity from prepared CLIP embeddings;
 - paired concept signals compared across chosen and rejected works;
-- source metadata for cautious medium, period, and culture/region clues;
+- source metadata for cautious medium, period, culture/region, and movement/style clues;
 - evidence quantity, reconstruction consistency, and visual coverage for **Emerging**, **Moderate**, or **Strong** labels.
 
 Profile names come from the controlled two-attribute mapping in `config.js`, with **The Eclectic Explorer** as the neutral fallback. Recommendations are ranked only among the six reserved recommendation works. The challenge freezes the result vector, records each prediction before display, and uses exactly six held-out works without updating the profile.

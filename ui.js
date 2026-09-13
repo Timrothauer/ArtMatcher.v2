@@ -56,7 +56,8 @@ function artworkFacts(artwork) {
   const creator = artwork.artist || "Creator not recorded";
   const date = artwork.yearLabel || "Date not recorded";
   const region = artwork.cultureOrRegion || "Region not recorded";
-  facts.append(element("p", "artwork-credit", `${creator} · ${date} · ${region}`));
+  const movementOrStyle = artwork.movementOrStyle || "Style not recorded";
+  facts.append(element("p", "artwork-credit", `${creator} · ${date} · ${region} · ${movementOrStyle}`));
   if (artwork.medium) facts.append(element("p", "artwork-medium", artwork.medium));
   const sourceLink = element("a", "source-link", `View at ${artwork.source}`);
   sourceLink.href = artwork.sourceUrl;
@@ -288,14 +289,14 @@ function renderFactualSection(tendencies) {
   const section = element("section", "result-section factual-section");
   section.append(element("h3", "section-title", "Factual clues in the works you saw"));
   if (!tendencies.length) {
-    section.append(element("p", "mixed-copy", "No medium, period, or culture field appeared often enough to support a responsible factual tendency."));
+    section.append(element("p", "mixed-copy", "No medium, period, culture, or movement/style field appeared often enough to support a responsible factual tendency."));
     return section;
   }
   const list = element("ul", "factual-list");
   tendencies.forEach((item) => {
     const direction = item.direction === "favored" ? "appeared more often among selected works" : "appeared more often among works not selected";
     const entry = element("li", "");
-    entry.append(element("strong", "", `${item.dimension}: ${item.value}`), element("span", "", `${direction} across ${item.exposure} exposures · ${item.confidence}`));
+    entry.append(element("strong", "", `${item.dimension}: ${item.value}`), element("span", "", `${direction} across ${item.exposure} distinct works · ${item.confidence}`));
     list.append(entry);
   });
   section.append(list);
@@ -339,9 +340,13 @@ export function renderResults(result, { onRestart, onChallenge }) {
   }
 
   const leading = result.profileAttributes.map((signal) => signal.label.toLowerCase());
-  const summary = leading.length >= 2
+  const preferredStyles = (result.preferredMovementStyles ?? []).map((item) => item.value);
+  const styleSummary = preferredStyles.length
+    ? ` Within this catalog, your choices also leaned toward ${preferredStyles.join(" and ")}.`
+    : " No single movement or style appeared often enough to support a responsible preference.";
+  const summary = (leading.length >= 2
     ? `Your choices suggest a pull toward ${leading.join(" and ")}. The profile combines ${result.directionalCount} directional choices with their consistency and visual coverage; it remains an exploratory snapshot, not a fixed account of your taste.`
-    : "Your choices point in several directions, so the profile remains intentionally broad. Mixed evidence is part of the result rather than something the snapshot tries to hide.";
+    : "Your choices point in several directions, so the profile remains intentionally broad. Mixed evidence is part of the result rather than something the snapshot tries to hide.") + styleSummary;
   view.append(
     element("h2", "profile-name", result.profileName),
     element("p", "profile-support", leading.length ? `${result.profileAttributes.map((item) => `${item.label} · ${item.confidence}`).join("  /  ")}  /  Overall ${result.overallConfidence.label}` : `Mixed visual evidence  /  Overall ${result.overallConfidence.label}`),

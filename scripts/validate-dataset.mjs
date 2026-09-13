@@ -6,10 +6,11 @@ import { RawImage } from "@huggingface/transformers";
 
 const projectRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const failures = [];
-const requiredFields = ["id", "sourceId", "source", "sourceUrl", "title", "artist", "yearLabel", "yearStart", "yearEnd", "cultureOrRegion", "originalImageUrl", "imagePath", "imageAlt", "rightsStatement", "quizRole", "conceptScores"];
+const requiredFields = ["id", "sourceId", "source", "sourceUrl", "title", "artist", "yearLabel", "yearStart", "yearEnd", "cultureOrRegion", "movementOrStyle", "originalImageUrl", "imagePath", "imageAlt", "rightsStatement", "quizRole", "conceptScores"];
 const roles = ["quiz", "recommendation", "holdout"];
 const scoreKeys = ["abstract", "figurative", "minimal", "visuallyDense", "geometric", "organic", "restrainedColor", "saturatedColor", "calm", "dramatic", "traditional", "experimental"];
 const normalizedRegions = new Set(["England", "France", "Germany", "Ghana (Asante)", "Italy (Nola)", "Japan", "Korea (Joseon)", "Netherlands", "Peru (Chimú)", "Peru (Moche)", "Peru (Nasca)", "Roman", "United States"]);
+const normalizedMovementsAndStyles = new Set(["American Realism", "Apulian Greek", "Asante", "Augustan Roman", "Baroque", "Chimú", "Dutch Golden Age", "Early Bronze Age", "Early Photography", "Expressionism", "Hudson River School", "Impressionism", "Italo-Byzantine", "Joseon Porcelain", "Kanō School", "Middle Kingdom Egyptian", "Moche", "Modern Sculpture", "Nasca", "Neo-Impressionism", "Neoclassicism", "Neoplasticism", "Pictorialism", "Post-Impressionism", "Precisionism", "Renaissance", "Rococo", "Romanticism", "Symbolism", "Ukiyo-e", "Victorian Photography"]);
 
 function fail(message) {
   failures.push(message);
@@ -52,6 +53,7 @@ for (const artwork of artworks) {
   if (Number.isFinite(artwork.yearStart) && Number.isFinite(artwork.yearEnd) && artwork.yearStart > artwork.yearEnd) fail(`${artwork.id} has an inverted year range`);
   if (typeof artwork.cultureOrRegion !== "string" || artwork.cultureOrRegion !== artwork.cultureOrRegion.trim()) fail(`${artwork.id} has an invalid culture or region label`);
   if (artwork.cultureOrRegion && !normalizedRegions.has(artwork.cultureOrRegion)) fail(`${artwork.id} has an unnormalized culture or region label: ${artwork.cultureOrRegion}`);
+  if (typeof artwork.movementOrStyle !== "string" || !normalizedMovementsAndStyles.has(artwork.movementOrStyle)) fail(`${artwork.id} has an invalid movement or style label: ${artwork.movementOrStyle}`);
   if (!roles.includes(artwork.quizRole)) fail(`${artwork.id} has invalid role ${artwork.quizRole}`);
   else roleCounts[artwork.quizRole] += 1;
   try {
@@ -117,4 +119,4 @@ console.log(`PASS: roles ${JSON.stringify(roleCounts)}`);
 console.log(`PASS: ${embeddingIds.length} normalized ${dimension}-dimension embeddings`);
 console.log(`PASS: all ${scoreKeys.length} concept scores exist for every artwork`);
 console.log(`PASS: ${pairs.length} deterministic quiz-only initial pairs`);
-console.log("PASS: artist, year, and culture/region labels use normalized display formats");
+console.log("PASS: artist, year, culture/region, and movement/style labels use normalized display formats");
