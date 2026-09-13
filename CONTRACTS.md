@@ -26,7 +26,7 @@ These seams are permanent from Phase 0 onward. Missing string values use `""`, m
 - `renderList(items)`
 - `clearResults()`
 
-Phase 1 additively exports `renderWelcome`, `renderComparison`, `renderReveal`, and `renderResults`. All visible state and DOM mutation remains in `ui.js`.
+Phase 1 additively introduced `renderWelcome`, `renderComparison`, `renderReveal`, and `renderResults`. Phase 2 additively introduces `renderRefinementIntro`, `renderChallengeComparison`, `renderChallengeReveal`, and `renderChallengeSummary`. All visible state and DOM mutation remains in `ui.js`.
 
 ## Data source methods
 
@@ -37,84 +37,52 @@ Phase 1 additively exports `renderWelcome`, `renderComparison`, `renderReveal`, 
 - `source.save(record)`
 - `source.list()`
 
-`source.load()` preserves the Phase 0 contract and returns an array of sample records. `source.load({ scenario: "empty" | "error" })` exercises the permanent foundation states. `source.load({ dataset: "profiler" })` additively returns the Phase 1 profiler bundle described below. `source.detail(id)` returns one sample or artwork record, or `null`. `save` and `list` throw `Not used in this project` because this project has no persistence.
+`source.load()` preserves the Phase 0 contract and returns an array of sample records. `source.load({ scenario: "empty" | "error" })` exercises the permanent foundation states. `source.load({ dataset: "profiler" })` returns the profiler bundle described below. `source.detail(id)` returns one sample or artwork record, or `null`. `save` and `list` throw `Not used in this project` because this project has no persistence.
 
-## Phase 0 source record
+## Source records and profiler bundle
 
-```js
-{
-  id: "sample-observe",
-  title: "Observe",
-  description: "A fictional placeholder representing a future view."
-}
-```
-
-## Phase 1 artwork record
+The Phase 0 sample record remains:
 
 ```js
-{
-  id: "aic-65821",
-  sourceId: "65821",
-  source: "Art Institute of Chicago",
-  sourceUrl: "https://…",
-  title: "Composition (No. 1) Gray-Red",
-  artist: "Piet Mondrian…",
-  yearLabel: "1935",
-  yearStart: 1935,
-  yearEnd: 1935,
-  medium: "Oil on canvas",
-  cultureOrRegion: "Netherlands",
-  department: "…",
-  originalImageUrl: "https://…",
-  imagePath: "assets/artworks/aic-65821.jpg",
-  imageAlt: "…",
-  rightsStatement: "Public Domain…",
-  quizRole: "quiz | recommendation | holdout",
-  conceptScores: {
-    abstract: 0,
-    figurative: 0,
-    minimal: 0,
-    visuallyDense: 0,
-    geometric: 0,
-    organic: 0,
-    restrainedColor: 0,
-    saturatedColor: 0,
-    calm: 0,
-    dramatic: 0,
-    traditional: 0,
-    experimental: 0
-  }
-}
+{ id: "sample-observe", title: "Observe", description: "A fictional placeholder representing a future view." }
 ```
 
-The numeric concept-score examples above describe shape, not literal values. They are preparation-time model signals rather than factual source metadata.
+The Phase 1 artwork contract remains unchanged and includes every documented metadata key plus all twelve concept-score keys. `quizRole` is exactly `quiz`, `recommendation`, or `holdout`.
 
-## Embedding file and profiler bundle
-
-`data/embeddings.json` has `{ metadata, embeddings }`. `metadata` always includes `package`, `packageVersion`, `checkpoint`, `revision`, `dtype`, `dimension`, `normTolerance`, `promptVersion`, `conceptGroups`, `imageHashes`, and `generatedAt`. `embeddings` maps every stable artwork ID to one normalized finite numeric array of the documented dimension.
+`data/embeddings.json` remains `{ metadata, embeddings }`. `metadata` includes `package`, `packageVersion`, `checkpoint`, `revision`, `dtype`, `dimension`, `normTolerance`, `promptVersion`, `conceptGroups`, `imageHashes`, and `generatedAt`. `embeddings` maps every stable artwork ID to one normalized finite numeric array.
 
 `source.load({ dataset: "profiler" })` returns:
 
 ```js
-{
-  artworks: [],
-  embeddings: {},
-  embeddingMetadata: {},
-  pairs: []
-}
+{ artworks: [], embeddings: {}, embeddingMetadata: {}, pairs: [] }
 ```
 
 High-dimensional embeddings remain separate from artwork records and join only by stable artwork ID.
 
-## Pair, answer, and state shapes
+## Pair and answer shapes
 
-An initial pair is:
+An initial pair remains:
 
 ```js
 { id: "initial-1", leftId: "aic-65821", rightId: "aic-27992" }
 ```
 
-An answer is:
+An adaptive pair additively includes inspectable heuristic fields:
+
+```js
+{
+  id: "adaptive-aic-11143::met-436532",
+  leftId: "aic-11143",
+  rightId: "met-436532",
+  key: "aic-11143::met-436532",
+  margin: 0,
+  separation: 0,
+  informationScore: 0,
+  includesUnseen: true
+}
+```
+
+The numeric examples describe shape, not literal output. A quiz answer is:
 
 ```js
 {
@@ -123,23 +91,115 @@ An answer is:
   rightId: "aic-27992",
   choice: "left | right | neither",
   chosenId: "aic-65821",
-  rejectedId: "aic-27992"
+  rejectedId: "aic-27992",
+  round: "initial | adaptive"
 }
 ```
 
-For `neither`, `chosenId` and `rejectedId` are `""`. Phase 1 application state is held only in memory:
+For `neither`, `chosenId` and `rejectedId` are `""`.
+
+## Phase 2 application state
+
+State is held only in memory and always has this complete shape:
 
 ```js
 {
-  stage: "welcome | initial | reveal | results",
+  stage: "welcome | initial | refinement | adaptive | reveal | results | challenge | challengeReveal | challengeSummary",
   initialIndex: 0,
+  adaptiveCount: 0,
   answers: [],
+  shownPairKeys: [],
+  artworkDisplayCounts: {},
   preferenceVector: [],
+  profileName: "",
+  attributeResults: [],
+  recommendations: [],
+  frozenChallengeVector: [],
+  challengePredictions: [],
+  challengeAnswers: [],
+  challengeIndex: 0,
+  currentPair: null,
+  currentRound: "",
+  unavailableArtworkIds: [],
   result: null
 }
 ```
 
-Restart and refresh recreate this complete initial state. A taste result contains `insufficient`, `directionalCount`, `neitherCount`, `preferenceVector`, `supported`, `mixed`, and `representativeChoices` on every result.
+Restart and refresh recreate this complete initial state.
+
+## Result and evidence shapes
+
+A taste result preserves the Phase 1 keys and additively contains:
+
+```js
+{
+  insufficient: false,
+  directionalCount: 0,
+  neitherCount: 0,
+  preferenceVector: [],
+  supported: [],
+  mixed: [],
+  representativeChoices: [],
+  attributeResults: [],
+  factualTendencies: [],
+  profileName: "The Eclectic Explorer",
+  profileAttributes: [],
+  recommendations: [],
+  overallConfidence: {
+    label: "Emerging | Moderate | Strong",
+    score: 0,
+    quantity: 0,
+    consistency: 0,
+    coverage: 0
+  }
+}
+```
+
+Each attribute result contains `dimension`, `label`, `oppositeLabel`, `strength`, `position`, `mixed`, `confidence`, `confidenceScore`, `evidenceCount`, `supportingChoiceIds`, and `contradictingChoiceIds`. Internal numeric scores support transparent ordering and rendering but are never presented as calibrated probabilities.
+
+Each recommendation contains `{ artwork, score, explanation, matchingSignals }`. `artwork.quizRole` must be `recommendation`; the score is an internal similarity used only for deterministic ranking.
+
+## Controlled profile-name mapping
+
+`config.profileNameRules` is the only approved name map. It currently permits:
+
+- The Quiet Formalist
+- The Narrative Traditionalist
+- The Chromatic Experimentalist
+- The Abstract Architect
+- The Poetic Naturalist
+- The Dramatic Maximalist
+- The Essentialist
+- The Narrative Dramatist
+- The Abstract Experimentalist
+- The Constructive Experimentalist
+- The Eclectic Explorer as the neutral mixed or unmapped fallback
+
+Names use only sufficiently supported visual attributes. They never use sensitive traits or imply diagnosis.
+
+## Challenge shapes
+
+A challenge pair is fixed deterministically from two holdout works:
+
+```js
+{ id: "challenge-1", leftId: "…", rightId: "…", predictedId: "…" }
+```
+
+`predictedId` is recorded from `frozenChallengeVector` before the pair renders. A challenge answer always contains:
+
+```js
+{
+  pairId: "challenge-1",
+  leftId: "…",
+  rightId: "…",
+  predictedId: "…",
+  choice: "left | right | neither | unavailable",
+  chosenId: "",
+  agreed: false
+}
+```
+
+Challenge scoring returns `{ agreements, directionalTrials, inconclusiveTrials, unavailableTrials }`. Challenge answers never enter the main `answers` collection and never update the frozen vector.
 
 ## DO NOT CHANGE WITHOUT ASKING
 

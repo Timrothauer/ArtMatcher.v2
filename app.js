@@ -1,10 +1,22 @@
 import { config } from "./config.js";
-import { createInitialState, createTasteResult } from "./inference.js";
+import {
+  createChallenge,
+  createInitialState,
+  createTasteResult,
+  pairKey,
+  preferenceFromAnswers,
+  scoreChallenge,
+  selectAdaptivePair
+} from "./inference.js";
 import { source } from "./source.js";
 import {
   clearResults,
+  renderChallengeComparison,
+  renderChallengeReveal,
+  renderChallengeSummary,
   renderComparison,
   renderList,
+  renderRefinementIntro,
   renderResults,
   renderReveal,
   renderWelcome,
@@ -30,48 +42,122 @@ function artworkById(id) {
   return data.artworks.find((artwork) => artwork.id === id);
 }
 
-function showCurrentComparison() {
-  const pair = data.pairs[state.initialIndex];
-  state.stage = "initial";
+function markQuizPairShown(pair) {
+  const key = pairKey(pair.leftId, pair.rightId);
+  if (state.shownPairKeys.includes(key)) return;
+  state.shownPairKeys.push(key);
+  state.artworkDisplayCounts[pair.leftId] = (state.artworkDisplayCounts[pair.leftId] ?? 0) + 1;
+  state.artworkDisplayCounts[pair.rightId] = (state.artworkDisplayCounts[pair.rightId] ?? 0) + 1;
+}
+
+function showQuizPair(pair, round) {
+  state.currentPair = pair;
+  state.currentRound = round;
+  state.stage = round;
+  markQuizPairShown(pair);
+  const isAdaptive = round === "adaptive";
+  const index = isAdaptive ? state.adaptiveCount : state.initialIndex;
+  const total = isAdaptive ? config.adaptiveComparisonCount : config.initialComparisonCount;
   renderComparison({
-    pair,
     left: artworkById(pair.leftId),
     right: artworkById(pair.rightId),
-    index: state.initialIndex,
-    total: config.initialComparisonCount,
-    onChoose: recordChoice
+    index,
+    total,
+    round: isAdaptive ? "Refinement" : "Comparison",
+    onChoose: recordQuizChoice,
+    onFinish: isAdaptive && state.adaptiveCount >= config.minimumAdaptiveAnswers ? finishQuiz : null,
+    onImageError: (artworkId) => handleQuizImageFailure(pair.id, artworkId)
   });
-  setStatus(`Comparison ${state.initialIndex + 1} of ${config.initialComparisonCount}`);
+  setStatus(`${isAdaptive ? "Refinement" : "Comparison"} ${index + 1} of ${total}`);
+}
+
+function showCurrentInitialComparison() {
+  showQuizPair(data.pairs[state.initialIndex], "initial");
+}
+
+function adaptivePair() {
+  state.preferenceVector = preferenceFromAnswers(state.answers, data.embeddings);
+  return selectAdaptivePair({
+    artworks: data.artworks,
+    embeddings: data.embeddings,
+    preferenceVector: state.preferenceVector,
+    answers: state.answers,
+    shownPairKeys: state.shownPairKeys,
+    displayCounts: state.artworkDisplayCounts,
+    config,
+    excludedIds: state.unavailableArtworkIds
+  });
+}
+
+function showNextAdaptiveComparison() {
+  const pair = adaptivePair();
+  if (!pair) {
+    finishQuiz();
+    return;
+  }
+  showQuizPair(pair, "adaptive");
+}
+
+function beginRefinement() {
+  state.preferenceVector = preferenceFromAnswers(state.answers, data.embeddings);
+  state.stage = "refinement";
+  renderRefinementIntro(showNextAdaptiveComparison);
+  setStatus("The first eight choices are complete. Refinement is ready.");
 }
 
 function finishQuiz() {
   state.result = createTasteResult(state.answers, data.artworks, data.embeddings, config);
-  state.preferenceVector = state.result.preferenceVector;
+  state.preferenceVector = [...state.result.preferenceVector];
+  state.profileName = state.result.profileName;
+  state.attributeResults = state.result.attributeResults;
+  state.recommendations = state.result.recommendations;
   state.stage = "results";
-  renderResults(state.result, restart);
-  setStatus("Your taste snapshot is ready.");
+  renderResults(state.result, { onRestart: restart, onChallenge: startChallenge });
+  setStatus("Your refined taste snapshot is ready.");
 }
 
 function continueAfterReveal() {
-  state.initialIndex += 1;
-  if (state.initialIndex >= config.initialComparisonCount) finishQuiz();
-  else showCurrentComparison();
+  if (state.currentRound === "initial") {
+    state.initialIndex += 1;
+    if (state.initialIndex >= config.initialComparisonCount) beginRefinement();
+    else showCurrentInitialComparison();
+    return;
+  }
+  if (state.adaptiveCount >= config.adaptiveComparisonCount) finishQuiz();
+  else showNextAdaptiveComparison();
 }
 
-function recordChoice(choice) {
-  if (state.stage !== "initial") return;
-  const pair = data.pairs[state.initialIndex];
+function recordQuizChoice(choice) {
+  if (state.stage !== "initial" && state.stage !== "adaptive") return;
+  const pair = state.currentPair;
+  const round = state.currentRound;
   const chosenId = choice === "left" ? pair.leftId : choice === "right" ? pair.rightId : "";
   const rejectedId = choice === "left" ? pair.rightId : choice === "right" ? pair.leftId : "";
-  state.answers.push({ pairId: pair.id, leftId: pair.leftId, rightId: pair.rightId, choice, chosenId, rejectedId });
+  state.answers.push({ pairId: pair.id, leftId: pair.leftId, rightId: pair.rightId, choice, chosenId, rejectedId, round });
+  if (round === "adaptive") state.adaptiveCount += 1;
   state.stage = "reveal";
   renderReveal({
     left: artworkById(pair.leftId),
     right: artworkById(pair.rightId),
     choice,
-    onContinue: continueAfterReveal
+    round,
+    onContinue: continueAfterReveal,
+    onFinish: round === "adaptive" && state.adaptiveCount >= config.minimumAdaptiveAnswers ? finishQuiz : null
   });
   setStatus(choice === "neither" ? "Response recorded as Neither / Unsure." : "Choice recorded. Artwork details revealed.");
+}
+
+function handleQuizImageFailure(pairId, artworkId) {
+  if ((state.stage !== "initial" && state.stage !== "adaptive") || state.currentPair?.id !== pairId) return;
+  if (!state.unavailableArtworkIds.includes(artworkId)) state.unavailableArtworkIds.push(artworkId);
+  const replacement = adaptivePair();
+  if (!replacement) {
+    if (state.currentRound === "adaptive") finishQuiz();
+    else showError("An artwork image was unavailable and no safe replacement comparison could be prepared. Please start over.");
+    return;
+  }
+  showQuizPair(replacement, state.currentRound);
+  setStatus("One image was unavailable, so that pair was skipped and replaced.");
 }
 
 async function startQuiz() {
@@ -80,12 +166,110 @@ async function startQuiz() {
   try {
     data = await source.load({ dataset: "profiler" });
     state = createInitialState();
-    showCurrentComparison();
+    showCurrentInitialComparison();
   } catch (error) {
     showError(error instanceof Error ? error.message : "The profiler could not be started.");
   } finally {
     setBusy(false);
   }
+}
+
+function showChallengePair() {
+  const pair = state.challengePredictions[state.challengeIndex];
+  state.stage = "challenge";
+  state.currentPair = pair;
+  renderChallengeComparison({
+    left: artworkById(pair.leftId),
+    right: artworkById(pair.rightId),
+    index: state.challengeIndex,
+    total: config.challengePairCount,
+    onChoose: recordChallengeChoice,
+    onImageError: () => recordUnavailableChallenge(pair.id)
+  });
+  setStatus(`Profile challenge ${state.challengeIndex + 1} of ${config.challengePairCount}`);
+}
+
+function startChallenge() {
+  const challenge = createChallenge(data.artworks, data.embeddings, state.preferenceVector, config.challengePairCount);
+  if (challenge.pairs.length !== config.challengePairCount) {
+    showError("The profile challenge could not prepare all three held-out pairs.");
+    return;
+  }
+  state.frozenChallengeVector = challenge.frozenVector;
+  state.challengePredictions = challenge.pairs;
+  state.challengeAnswers = [];
+  state.challengeIndex = 0;
+  showChallengePair();
+}
+
+function recordChallengeChoice(choice) {
+  if (state.stage !== "challenge") return;
+  const pair = state.challengePredictions[state.challengeIndex];
+  const chosenId = choice === "left" ? pair.leftId : choice === "right" ? pair.rightId : "";
+  const answer = {
+    pairId: pair.id,
+    leftId: pair.leftId,
+    rightId: pair.rightId,
+    predictedId: pair.predictedId,
+    choice,
+    chosenId,
+    agreed: Boolean(chosenId) && chosenId === pair.predictedId
+  };
+  state.challengeAnswers.push(answer);
+  state.stage = "challengeReveal";
+  renderChallengeReveal({
+    left: artworkById(pair.leftId),
+    right: artworkById(pair.rightId),
+    predictionId: pair.predictedId,
+    choice,
+    agreed: answer.agreed,
+    unavailable: false,
+    onContinue: continueChallenge
+  });
+  setStatus(choice === "neither" ? "Challenge response recorded as inconclusive." : answer.agreed ? "Your choice agreed with the snapshot." : "Your choice differed from the snapshot.");
+}
+
+function recordUnavailableChallenge(pairId) {
+  if (state.stage !== "challenge" || state.currentPair?.id !== pairId) return;
+  const pair = state.challengePredictions[state.challengeIndex];
+  state.challengeAnswers.push({
+    pairId: pair.id,
+    leftId: pair.leftId,
+    rightId: pair.rightId,
+    predictedId: pair.predictedId,
+    choice: "unavailable",
+    chosenId: "",
+    agreed: false
+  });
+  state.stage = "challengeReveal";
+  renderChallengeReveal({
+    left: artworkById(pair.leftId),
+    right: artworkById(pair.rightId),
+    predictionId: pair.predictedId,
+    choice: "unavailable",
+    agreed: false,
+    unavailable: true,
+    onContinue: continueChallenge
+  });
+  setStatus("This challenge pair was unavailable and will not count.");
+}
+
+function continueChallenge() {
+  state.challengeIndex += 1;
+  if (state.challengeIndex < config.challengePairCount) {
+    showChallengePair();
+    return;
+  }
+  state.stage = "challengeSummary";
+  renderChallengeSummary(scoreChallenge(state.challengeAnswers), {
+    onRestart: restart,
+    onResults: () => {
+      state.stage = "results";
+      renderResults(state.result, { onRestart: restart, onChallenge: startChallenge });
+      setStatus("Your refined taste snapshot is ready.");
+    }
+  });
+  setStatus("The three-pair profile challenge is complete.");
 }
 
 function restart() {
@@ -125,10 +309,17 @@ clearButton.addEventListener("click", () => {
 });
 
 window.addEventListener("keydown", (event) => {
-  if (state.stage !== "initial" || event.altKey || event.ctrlKey || event.metaKey) return;
-  if (event.key === "ArrowLeft") recordChoice("left");
-  if (event.key === "ArrowRight") recordChoice("right");
-  if (event.key.toLowerCase() === "n") recordChoice("neither");
+  if (event.altKey || event.ctrlKey || event.metaKey) return;
+  if (state.stage === "initial" || state.stage === "adaptive") {
+    if (event.key === "ArrowLeft") recordQuizChoice("left");
+    if (event.key === "ArrowRight") recordQuizChoice("right");
+    if (event.key.toLowerCase() === "n") recordQuizChoice("neither");
+  }
+  if (state.stage === "challenge") {
+    if (event.key === "ArrowLeft") recordChallengeChoice("left");
+    if (event.key === "ArrowRight") recordChallengeChoice("right");
+    if (event.key.toLowerCase() === "n") recordChallengeChoice("neither");
+  }
 });
 
 renderWelcome(startQuiz);

@@ -1,6 +1,6 @@
 # Art Taste Profiler
 
-Art Taste Profiler is an educational, image-led visual-preference experiment. Phase 1 provides a fixed eight-comparison loop over a prepared local museum collection, then turns selected-minus-rejected CLIP embeddings into a cautious first taste snapshot. It is not a psychological assessment or permanent description of the visitor.
+Art Taste Profiler is an educational, image-led visual-preference experiment. Visitors make eight opening choices and up to six deterministic follow-up choices, then receive a named and explainable taste snapshot, local-catalog recommendations, and an optional three-pair prediction challenge. It is not a psychological assessment or permanent description of the visitor.
 
 ## Run locally
 
@@ -16,6 +16,21 @@ python3 -m http.server 4173 --bind 127.0.0.1
 Then open `http://127.0.0.1:4173`. Opening `index.html` directly is unsupported because the browser fetches local JSON files.
 
 The deployed browser is a static HTML/CSS/JavaScript app. It uses committed local images and saved numeric outputs only; it does not load a model, call a museum API, store visitor choices, or require an API key.
+
+## How the snapshot works
+
+For each directional answer, the browser subtracts the rejected artwork embedding from the chosen artwork embedding. It normalizes the sum into a current preference direction. **Neither / Unsure** is recorded but adds no direction.
+
+After eight fixed comparisons, a deterministic classroom heuristic chooses up to six quiz-only follow-ups. It excludes shown pairs and non-quiz roles, rejects weakly separated images, respects an artwork exposure cap, favors small predicted margins and under-covered evidence, and breaks ties by stable artwork ID. It is an inspectable heuristic, not a claim of mathematical optimality.
+
+The result combines:
+
+- visual similarity from prepared CLIP embeddings;
+- paired concept signals compared across chosen and rejected works;
+- source metadata for cautious medium, period, and culture/region clues;
+- evidence quantity, reconstruction consistency, and visual coverage for **Emerging**, **Moderate**, or **Strong** labels.
+
+Profile names come from the controlled two-attribute mapping in `config.js`, with **The Eclectic Explorer** as the neutral fallback. Recommendations are ranked only among the six reserved recommendation works. The challenge freezes the result vector, records each prediction before display, and uses exactly six held-out works without updating the profile.
 
 ## Prepared model outputs
 
@@ -45,4 +60,4 @@ The catalog uses public-domain or CC0 images and metadata from the Art Institute
 - Local JSON and local artwork images
 - Node preparation scripts using the built-in test runner
 - No frontend framework, bundler, runtime AI, API, backend, database, analytics, cookies, local storage, or persistent visitor profile
-- Adaptive comparisons, recommendations, profile challenge, and named profiles remain Phase 2 work and are not implemented in Phase 1
+- No recommendation outside the prepared local catalog and no scientific or sensitive-personal-attribute claim

@@ -1,9 +1,14 @@
 import { config } from "./config.js";
 
 async function fetchJson(path, errorMessage) {
-  const response = await fetch(path);
-  if (!response.ok) throw new Error(errorMessage);
-  return response.json();
+  try {
+    const response = await fetch(path);
+    if (!response.ok) throw new Error(errorMessage);
+    return await response.json();
+  } catch (error) {
+    if (error instanceof Error && error.message === errorMessage) throw error;
+    throw new Error(errorMessage);
+  }
 }
 
 async function readSample() {
