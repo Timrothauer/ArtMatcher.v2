@@ -49,3 +49,10 @@ Run every numbered check before a phase checkpoint.
 45. Confirm every artwork subtitle in reveals, representative choices, recommendations, and the challenge uses `Artist · Year · Region` order and displays neutral fallback text for missing values.
 46. Confirm the header shows only the `Art Taste Profiler` wordmark at the left edge, with no `ATP` abbreviation, and that the wordmark still returns to a clean welcome screen.
 47. Confirm every artwork subtitle uses `Artist · Year · Region · Movement/Style`, all 36 records have a validated movement/style label, and the final taste summary either names styles favored across at least two distinct works or explicitly says there is not enough movement/style evidence.
+48. Confirm the Phase 3 motion and polish pass animates only `transform` and `opacity`, introduces no parallax, scroll-jacking, autoplay, typewriter, count-up, animated gradient, or carousel behavior, and preserves every existing interaction.
+49. Emulate `prefers-reduced-motion: reduce` and confirm arrivals and interaction transitions are effectively removed while every state remains visible and understandable.
+50. Disable JavaScript and confirm static content remains visible because motion-hidden content is scoped behind the `.js` class.
+51. Confirm empty and error states render immediately as readable `.message` panels and are excluded from dynamic view entrance animation.
+52. Confirm the 3-second motion failsafe reveals any pending content, artwork images retain reserved aspect-ratio space while loading, and hover or focus feedback does not shift surrounding layout.
+53. On the **Test My Profile** choice screen, confirm the recorded-prediction notice has a clear visual buffer before the artwork pair at desktop and mobile widths.
+54. Confirm the final movement/style sentence in a directional taste summary uses the restrained accent color, including both a supported preference and the insufficient-style-evidence fallback, without changing the generated wording.
