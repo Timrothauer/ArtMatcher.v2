@@ -47,3 +47,4 @@ Run every numbered check before a phase checkpoint.
 43. At a 796×439 CSS viewport (or a 1592×878 Retina capture), confirm the hero tagline has normal letter and word spacing and never overlaps itself or the headline.
 44. Run dataset validation and confirm every artist, year, and culture/region value follows the documented display-label format; spot-check multi-creator, approximate-date, BCE/CE, missing-creator, and culture-qualified records in the reveal and result views.
 45. Confirm every artwork subtitle in reveals, representative choices, recommendations, and the challenge uses `Artist · Year · Region` order and displays neutral fallback text for missing values.
+46. Confirm the header shows only the `Art Taste Profiler` wordmark at the left edge, with no `ATP` abbreviation, and that the wordmark still returns to a clean welcome screen.
